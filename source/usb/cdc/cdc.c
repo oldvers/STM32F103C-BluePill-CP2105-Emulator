@@ -13,7 +13,7 @@
 #include "semphr.h"
 #include "fifo.h"
 
-#include "debug.h"
+#include "log.h"
 
 #include "gpio.h"
 #include "uart.h"
@@ -597,8 +597,24 @@ typedef struct _CDC_PORT
   CDC_EP_DATA_FUNCTION  epIBlkWr;
   CDC_EP_FUNCTION       epIBlkIsTxEmpty;
   U16                   modemHandshake;
-  U8                    modemStatus;
-  FW_BOOLEAN            rxComplete;
+  struct
+  {
+    U8  dtr : 1;
+    U8  rts : 1;
+    U8  rsv : 2;
+    U8  cts : 1;
+    U8  dsr : 1;
+    U8  ri  : 1;
+    U8  dcd : 1;
+  } modemStatus;
+  struct
+  {
+    FW_BOOLEAN  rxComplete : 1;
+    FW_BOOLEAN  ready      : 1;
+    FW_BOOLEAN  powerOn    : 1;
+    FW_BOOLEAN  setDtr     : 1;
+    FW_BOOLEAN  setRts     : 1;
+  };
   U32                   baudrate;
   FIFO_p                pRxFifo;
   FIFO_p                pTxFifo;
@@ -611,7 +627,6 @@ typedef struct _CDC_PORT
   SPEC_CHARS_p          pSpecChars;
   SERIAL_STATUS_p       pSerialStatus;
   UART_t                uart;
-  FW_BOOLEAN            ready;
 } CDC_PORT;
 
 //-----------------------------------------------------------------------------
@@ -665,22 +680,14 @@ static U8 * cdc_GetUartDtrRts(CDC_PORT * pPort)
   /* Bit 0 - DTR state, Bit 1 - RTS state */
   if (UART1 == pPort->uart)
   {
-    if (0 == GPIO_In(UART1_DTR_PORT, UART1_DTR_PIN))
+    if (FW_TRUE == pPort->powerOn)
     {
-      pPort->modemStatus |= MODEM_STATUS_DTR;
-    }
-    else
-    {
-      pPort->modemStatus &= ~MODEM_STATUS_DTR;
+      pPort->modemStatus.dtr = GPIO_In(UART1_DTR_PORT, UART1_DTR_PIN);
     }
 
-    if (0 == GPIO_In(UART1_RTS_PORT, UART1_RTS_PIN))
+    if (FW_FALSE == pPort->powerOn)
     {
-      pPort->modemStatus |= MODEM_STATUS_RTS;
-    }
-    else
-    {
-      pPort->modemStatus &= ~MODEM_STATUS_RTS;
+      pPort->modemStatus.rts = GPIO_In(UART1_RTS_PORT, UART1_RTS_PIN);
     }
   }
 
@@ -739,8 +746,8 @@ static void cdc_SetUartEnabled(CDC_PORT * pPort, U16 aValue)
       /* UART1: PA9 - Tx, PA10 - Rx, DTR - PB8, RTS - PB6 */
       GPIO_Init(UART1_TX_PORT,  UART1_TX_PIN,  GPIO_TYPE_OUT_PP_10MHZ, 1);
       GPIO_Init(UART1_RX_PORT,  UART1_RX_PIN,  GPIO_TYPE_IN_PUP_PDN,   1);
-      GPIO_Init(UART1_DTR_PORT, UART1_DTR_PIN, GPIO_TYPE_IN_PUP_PDN,   1);
-      GPIO_Init(UART1_RTS_PORT, UART1_RTS_PIN, GPIO_TYPE_IN_PUP_PDN,   1);
+      GPIO_Init(UART1_DTR_PORT, UART1_DTR_PIN, GPIO_TYPE_IN_ANALOG,    0);
+      GPIO_Init(UART1_RTS_PORT, UART1_RTS_PIN, GPIO_TYPE_IN_ANALOG,    0);
     }
     else
     {
@@ -750,6 +757,8 @@ static void cdc_SetUartEnabled(CDC_PORT * pPort, U16 aValue)
     }
     UART_DeInit(pPort->uart);
     pPort->ready = FW_FALSE;
+    /* After the enumeration the RTS and DTR lines can be enabled */
+    pPort->powerOn = FW_TRUE;
   }
   else
   {
@@ -768,8 +777,11 @@ static void cdc_SetUartEnabled(CDC_PORT * pPort, U16 aValue)
       /* UART1: PA9 - Tx, PA10 - Rx, DTR - PB8, RTS - PB6 */
       GPIO_Init(UART1_TX_PORT,  UART1_TX_PIN,  GPIO_TYPE_ALT_PP_10MHZ, 1);
       GPIO_Init(UART1_RX_PORT,  UART1_RX_PIN,  GPIO_TYPE_IN_PUP_PDN,   1);
-      GPIO_Init(UART1_DTR_PORT, UART1_DTR_PIN, GPIO_TYPE_OUT_OD_10MHZ, 1);
-      GPIO_Init(UART1_RTS_PORT, UART1_RTS_PIN, GPIO_TYPE_OUT_PP_10MHZ, 1);
+      if (FW_TRUE == pPort->powerOn)
+      {
+        GPIO_Init(UART1_DTR_PORT, UART1_DTR_PIN, GPIO_TYPE_OUT_OD_10MHZ, 1);
+        GPIO_Init(UART1_RTS_PORT, UART1_RTS_PIN, GPIO_TYPE_OUT_OD_10MHZ, 1);
+      }
     }
     else
     {
@@ -788,7 +800,12 @@ static void cdc_SetUartEnabled(CDC_PORT * pPort, U16 aValue)
       GPIO_Init(UART2_RX_PORT, UART2_RX_PIN, GPIO_TYPE_IN_PUP_PDN,   1);
     }
     pPort->ready = FW_TRUE;
-    pPort->modemStatus = (MODEM_STATUS_DTR | MODEM_STATUS_RTS);
+    pPort->modemStatus.dtr = FW_FALSE;
+    pPort->modemStatus.rts = FW_FALSE;
+    pPort->modemStatus.cts = FW_TRUE;
+    pPort->modemStatus.dsr = FW_TRUE;
+    pPort->setDtr = FW_TRUE;
+    pPort->setRts = FW_TRUE;
     UART_RxStart(pPort->uart);
   }
 }
@@ -822,35 +839,51 @@ static void cdc_UartPurge(CDC_PORT * pPort, U16 aValue)
 
 static void cdc_SetUartDtrRts(CDC_PORT * pPort, U16 aValue)
 {
+  FW_BOOLEAN value = FW_FALSE;
+
   pPort->modemHandshake = aValue;
 
   if (UART1 != pPort->uart) return;
 
   if (0 != (aValue & MODEM_HANDSHAKE_STATE_DTR_EN))
   {
-    if (0 == (aValue & MODEM_HANDSHAKE_STATE_DTR))
+    value = (FW_BOOLEAN)(0 < (aValue & MODEM_HANDSHAKE_STATE_DTR));
+    pPort->modemStatus.dtr = value;
+    pPort->setDtr ^= FW_TRUE;
+
+    if (FW_TRUE == pPort->setDtr)
     {
-      CDC_LOG(" --- DTR Set\r\n");
-      GPIO_Hi(UART1_DTR_PORT, UART1_DTR_PIN);
-    }
-    else
-    {
-      CDC_LOG(" --- DTR Clear\r\n");
-      GPIO_Lo(UART1_DTR_PORT, UART1_DTR_PIN);
+      if (FW_FALSE == value)
+      {
+        CDC_LOG(" --- DTR Set\r\n");
+        GPIO_Hi(UART1_DTR_PORT, UART1_DTR_PIN);
+      }
+      else
+      {
+        CDC_LOG(" --- DTR Clear\r\n");
+        GPIO_Lo(UART1_DTR_PORT, UART1_DTR_PIN);
+      }
     }
   }
 
   if (0 != (aValue & MODEM_HANDSHAKE_STATE_RTS_EN))
   {
-    if (0 == (aValue & MODEM_HANDSHAKE_STATE_RTS))
+    value = (FW_BOOLEAN)(0 < (aValue & MODEM_HANDSHAKE_STATE_RTS));
+    pPort->modemStatus.rts = value;
+    pPort->setRts ^= FW_TRUE;
+
+    if (FW_TRUE == pPort->setRts)
     {
-      CDC_LOG(" --- RTS Set\r\n");
-      GPIO_Hi(UART1_RTS_PORT, UART1_RTS_PIN);
-    }
-    else
-    {
-      CDC_LOG(" --- RTS Clear\r\n");
-      GPIO_Lo(UART1_RTS_PORT, UART1_RTS_PIN);
+      if (FW_FALSE == value)
+      {
+        CDC_LOG(" --- RTS Set\r\n");
+        GPIO_Hi(UART1_RTS_PORT, UART1_RTS_PIN);
+      }
+      else
+      {
+        CDC_LOG(" --- RTS Clear\r\n");
+        GPIO_Lo(UART1_RTS_PORT, UART1_RTS_PIN);
+      }
     }
   }
 }
@@ -1350,6 +1383,8 @@ void CDC_Init(void)
   /* Port is not ready yet */
   gPortA.ready = FW_FALSE;
   gPortA.rxComplete = FW_FALSE;
+  /* During the enumeration the RTS and DTR lines should be disabled */
+  gPortA.powerOn = FW_FALSE;
   /* Initialize Endpoints */
   gPortA.epOBlkRd        = USBD_CDC_OEndPointRdWsCb;
   gPortA.epOBlkIsRxEmpty = USBD_CDC_OEndPointIsRxEmpty;
@@ -1373,6 +1408,8 @@ void CDC_Init(void)
   /* Port is not ready yet */
   gPortB.ready = FW_FALSE;
   gPortB.rxComplete = FW_FALSE;
+  /* During the enumeration the RTS and DTR lines should be disabled */
+  gPortB.powerOn = FW_FALSE;
   /* Initialize Endpoints */
   gPortB.epOBlkRd        = USBD_CDD_OEndPointRdWsCb;
   gPortB.epOBlkIsRxEmpty = USBD_CDD_OEndPointIsRxEmpty;
