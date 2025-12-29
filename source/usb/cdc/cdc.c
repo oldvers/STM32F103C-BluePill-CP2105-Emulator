@@ -34,7 +34,7 @@
 //-----------------------------------------------------------------------------
 /* Private Types definitions */
 
-#define USB_CDC_FIFO_SIZE              (USB_CDC_PACKET_SIZE * 9)
+#define USB_CDC_FIFO_SIZE               (USB_CDC_PACKET_SIZE * 9)
 
 //-----------------------------------------------------------------------------
 /* Vendor Specific Requests */
@@ -214,78 +214,6 @@ typedef __packed struct COMM_PROP_RSP_S
   U8 uniProvName[15];
 } COMM_PROP_RSP_t, * COMM_PROP_RSP_p;
 
-static COMM_PROP_RSP_t gCommPropA =
-{
-  .wLength            = sizeof(COMM_PROP_RSP_t),
-  .bcdVersion         = COMM_PROP_RSP_VERSION,
-  .ulServiceMask      = COMM_PROP_RSP_SVC_ID,
-  .ulMaxTxQueue       = USB_CDC_FIFO_SIZE,
-  .ulMaxRxQueue       = USB_CDC_FIFO_SIZE,
-  .ulMaxBaud          = 2000000,
-  .ulProvSubType      = COMM_PROP_RSP_PROV_SUB_TYPE_RS232,
-  .ulProvCapabilities = COMM_PROP_RSP_PROV_CAPABS_DTR_DSR |
-                        COMM_PROP_RSP_PROV_CAPABS_RTS_CTS |
-                        COMM_PROP_RSP_PROV_CAPABS_CHECK_PARITY,
-  .ulSettableParams   = COMM_PROP_RSP_SETBL_PARAM_PARITY_TYPE |
-                        COMM_PROP_RSP_SETBL_PARAM_BAUD |
-                        COMM_PROP_RSP_SETBL_PARAM_DATA_BITS |
-                        COMM_PROP_RSP_SETBL_PARAM_STOP_BITS |
-                        COMM_PROP_RSP_SETBL_PARAM_HANDSHAKE |
-                        COMM_PROP_RSP_SETBL_PARAM_PARITY,
-  .ulSettableBaud     = COMM_PROP_RSP_BAUD_1200   |
-                        COMM_PROP_RSP_BAUD_1800   |
-                        COMM_PROP_RSP_BAUD_2400   |
-                        COMM_PROP_RSP_BAUD_4800   |
-                        COMM_PROP_RSP_BAUD_7200   |
-                        COMM_PROP_RSP_BAUD_9600   |
-                        COMM_PROP_RSP_BAUD_14400  |
-                        COMM_PROP_RSP_BAUD_19200  |
-                        COMM_PROP_RSP_BAUD_38400  |
-                        COMM_PROP_RSP_BAUD_56000  |
-                        COMM_PROP_RSP_BAUD_128000 |
-                        COMM_PROP_RSP_BAUD_115200 |
-                        COMM_PROP_RSP_BAUD_57600  |
-                        COMM_PROP_RSP_BAUD_OTHER,
-  .wSettableData      = COMM_PROP_RSP_SETBL_DATA_8,
-  .uniProvName        = "SILABS USB V2.0",
-};
-
-static COMM_PROP_RSP_t gCommPropB =
-{
-  .wLength            = sizeof(COMM_PROP_RSP_t),
-  .bcdVersion         = COMM_PROP_RSP_VERSION,
-  .ulServiceMask      = COMM_PROP_RSP_SVC_ID,
-  .ulMaxTxQueue       = USB_CDC_FIFO_SIZE,
-  .ulMaxRxQueue       = USB_CDC_FIFO_SIZE,
-  .ulMaxBaud          = 2000000,
-  .ulProvSubType      = COMM_PROP_RSP_PROV_SUB_TYPE_RS232,
-  .ulProvCapabilities = COMM_PROP_RSP_PROV_CAPABS_DTR_DSR |
-                        COMM_PROP_RSP_PROV_CAPABS_RTS_CTS |
-                        COMM_PROP_RSP_PROV_CAPABS_CHECK_PARITY,
-  .ulSettableParams   = COMM_PROP_RSP_SETBL_PARAM_PARITY_TYPE |
-                        COMM_PROP_RSP_SETBL_PARAM_BAUD |
-                        COMM_PROP_RSP_SETBL_PARAM_DATA_BITS |
-                        COMM_PROP_RSP_SETBL_PARAM_STOP_BITS |
-                        COMM_PROP_RSP_SETBL_PARAM_HANDSHAKE |
-                        COMM_PROP_RSP_SETBL_PARAM_PARITY,
-  .ulSettableBaud     = COMM_PROP_RSP_BAUD_1200   |
-                        COMM_PROP_RSP_BAUD_1800   |
-                        COMM_PROP_RSP_BAUD_2400   |
-                        COMM_PROP_RSP_BAUD_4800   |
-                        COMM_PROP_RSP_BAUD_7200   |
-                        COMM_PROP_RSP_BAUD_9600   |
-                        COMM_PROP_RSP_BAUD_14400  |
-                        COMM_PROP_RSP_BAUD_19200  |
-                        COMM_PROP_RSP_BAUD_38400  |
-                        COMM_PROP_RSP_BAUD_56000  |
-                        COMM_PROP_RSP_BAUD_128000 |
-                        COMM_PROP_RSP_BAUD_115200 |
-                        COMM_PROP_RSP_BAUD_57600  |
-                        COMM_PROP_RSP_BAUD_OTHER,
-  .wSettableData      = COMM_PROP_RSP_SETBL_DATA_8,
-  .uniProvName        = "SILABS USB V2.0",
-};
-
 //-----------------------------------------------------------------------------
 /* Line control settings */
 /* This command adjusts the line control settings for the selected CP210x
@@ -453,9 +381,6 @@ typedef __packed struct FLOW_CTRL_STATE_RSP_S
   U32 ulXoffLimit;
 } FLOW_CTRL_STATE_RSP_t, * FLOW_CTRL_STATE_RSP_p;
 
-static FLOW_CTRL_STATE_RSP_t gFlowCtrlStateA = {0};
-static FLOW_CTRL_STATE_RSP_t gFlowCtrlStateB = {0};
-
 //-----------------------------------------------------------------------------
 /* Special Characters Response */
 typedef __packed struct SPEC_CHARS_S
@@ -476,9 +401,6 @@ typedef __packed struct SPEC_CHARS_S
   /* The character used for XOFF */
   U8 bXoffChar;
 } SPEC_CHARS_t, * SPEC_CHARS_p;
-
-static SPEC_CHARS_t gSpecCharsA = {0};
-static SPEC_CHARS_t gSpecCharsB = {0};
 
 //-----------------------------------------------------------------------------
 /* Modem Status */
@@ -535,9 +457,6 @@ typedef __packed struct SERIAL_STATUS_S
   U8 bReserved;
 } SERIAL_STATUS_t, * SERIAL_STATUS_p;
 
-SERIAL_STATUS_t gSerialStatusA = {0};
-SERIAL_STATUS_t gSerialStatusB = {0};
-
 //-----------------------------------------------------------------------------
 /* This command sets the modem handshaking states for the selected CP210x
    interface according to the value of wValue. DTR and RTS values can be set
@@ -582,21 +501,23 @@ SERIAL_STATUS_t gSerialStatusB = {0};
 #define CP210X_PARTNUM_CP2105	                             (0x05)
 #define CP210X_PARTNUM_CP2108	                             (0x08)
 
-static U8 gPartNumber = CP210X_PARTNUM_CP2105;
-
 //-----------------------------------------------------------------------------
 
-typedef FW_BOOLEAN (*CDC_EP_FUNCTION)(void);
-typedef U32 (*CDC_EP_DATA_FUNCTION)(USBD_CbByte pPutByteCb, U32 aSize);
+typedef FW_BOOLEAN (*CDC_EP_CB_t)(USB_CDC_NUM);
+typedef U32 (*CDC_EP_Data_CB_t)(USB_CDC_NUM, USBD_CbByte, U32);
 
 /* CDC Port Context */
 typedef struct _CDC_PORT
 {
-  CDC_EP_DATA_FUNCTION  epOBlkRd;
-  CDC_EP_FUNCTION       epOBlkIsRxEmpty;
-  CDC_EP_DATA_FUNCTION  epIBlkWr;
-  CDC_EP_FUNCTION       epIBlkIsTxEmpty;
-  U16                   modemHandshake;
+  /* Callbacks */
+  CDC_EP_Data_CB_t  epOBlkRd;
+  CDC_EP_CB_t       epOBlkIsRxEmpty;
+  CDC_EP_Data_CB_t  epIBlkWr;
+  CDC_EP_CB_t       epIBlkIsTxEmpty;
+  USBD_CbByte       rxFifoPutCb;
+  USBD_CbByte       txFifoGetCb;
+  /* Parameters */
+  U16               modemHandshake;
   struct
   {
     U8  dtr : 1;
@@ -618,56 +539,165 @@ typedef struct _CDC_PORT
   U32                   baudrate;
   FIFO_p                pRxFifo;
   FIFO_p                pTxFifo;
-  USBD_CbByte           rxFifoPutCb;
-  USBD_CbByte           txFifoGetCb;
   U8                    rxBuffer[USB_CDC_FIFO_SIZE + 1];
   U8                    txBuffer[USB_CDC_FIFO_SIZE + 1];
-  COMM_PROP_RSP_p       pCommProp;
-  FLOW_CTRL_STATE_RSP_p pFlowCtrlState;
-  SPEC_CHARS_p          pSpecChars;
-  SERIAL_STATUS_p       pSerialStatus;
+  COMM_PROP_RSP_t       commProp;
+  FLOW_CTRL_STATE_RSP_t flowCtrlState;
+  SPEC_CHARS_t          specChars;
+  SERIAL_STATUS_t       serialStatus;
   UART_t                uart;
+  USB_CDC_NUM           num;
 } CDC_PORT;
-
-//-----------------------------------------------------------------------------
-/* Global Variables */
-
-static CDC_PORT          gPortA = {0};
-static CDC_PORT          gPortB = {0};
 
 //-----------------------------------------------------------------------------
 /* Private Functions declarations */
 
-static FW_BOOLEAN uart_FifoPutA(U8 * pByte);
-static FW_BOOLEAN uart_FifoGetA(U8 * pByte);
-static FW_BOOLEAN uart_RxCompleteA(U8 * pByte);
-static FW_BOOLEAN uart_TxCompleteA(U8 * pByte);
-static FW_BOOLEAN uart_FifoPutB(U8 * pByte);
-static FW_BOOLEAN uart_FifoGetB(U8 * pByte);
-static FW_BOOLEAN uart_RxCompleteB(U8 * pByte);
-static FW_BOOLEAN uart_TxCompleteB(U8 * pByte);
+static FW_BOOLEAN uart_FifoPut(U32 aParam, U8 * pByte);
+static FW_BOOLEAN uart_FifoGet(U32 aParam, U8 * pByte);
+static FW_BOOLEAN uart_RxComplete(U32 aParam, U8 * pByte);
+static FW_BOOLEAN uart_TxComplete(U32 aParam, U8 * pByte);
+
+static void cdc_RxFifoPut(U32 aParam, U8 * pByte);
+static void cdc_TxFifoGet(U32 aParam, U8 * pByte);
 
 //-----------------------------------------------------------------------------
-/** @brief Gets CDC Port according to USB Interface Number
- *  @param aInterface - USB Interface Number
- *  @return Pointer to the CDC Port Context
- */
+/* Global Variables */
 
-static CDC_PORT * cdc_GetPort(U16 aInterface)
+static CDC_PORT gCdcPort[USB_CDC_CNT] =
 {
-  CDC_PORT * result = &gPortA;
-
-  if (USBD_CDC_GetInterfaceNumber() == aInterface)
+  [USB_CDC0_NUM] =
   {
-    result = &gPortA;
-  }
-  else
+    /* Callbacks */
+    .epOBlkRd        = USBD_CDC_OEP_RdWsCb,
+    .epOBlkIsRxEmpty = USBD_CDC_OEP_IsRxEmpty,
+    .epIBlkWr        = USBD_CDC_IEP_WrWsCb,
+    .epIBlkIsTxEmpty = USBD_CDC_IEP_IsTxEmpty,
+    .rxFifoPutCb     = cdc_RxFifoPut,
+    .txFifoGetCb     = cdc_TxFifoGet,
+    /* Parameters */
+    .modemHandshake  = 0,
+    .modemStatus     = {0},
+    .rxComplete      = FW_FALSE,
+    .ready           = FW_FALSE,
+    /* During the enumeration the RTS and DTR lines should be disabled */
+    .powerOn         = FW_FALSE,
+    .setDtr          = FW_FALSE,
+    .setRts          = FW_FALSE,
+    /* FIFOs will be initialized during the startup later */
+    .pRxFifo         = NULL,
+    .pTxFifo         = NULL,
+    .rxBuffer        = {0},
+    .txBuffer        = {0},
+    .commProp =
+    {
+      .wLength            = sizeof(COMM_PROP_RSP_t),
+      .bcdVersion         = COMM_PROP_RSP_VERSION,
+      .ulServiceMask      = COMM_PROP_RSP_SVC_ID,
+      .ulMaxTxQueue       = USB_CDC_FIFO_SIZE,
+      .ulMaxRxQueue       = USB_CDC_FIFO_SIZE,
+      .ulMaxBaud          = 2000000,
+      .ulProvSubType      = COMM_PROP_RSP_PROV_SUB_TYPE_RS232,
+      .ulProvCapabilities = COMM_PROP_RSP_PROV_CAPABS_DTR_DSR |
+                            COMM_PROP_RSP_PROV_CAPABS_RTS_CTS |
+                            COMM_PROP_RSP_PROV_CAPABS_CHECK_PARITY,
+      .ulSettableParams   = COMM_PROP_RSP_SETBL_PARAM_PARITY_TYPE |
+                            COMM_PROP_RSP_SETBL_PARAM_BAUD |
+                            COMM_PROP_RSP_SETBL_PARAM_DATA_BITS |
+                            COMM_PROP_RSP_SETBL_PARAM_STOP_BITS |
+                            COMM_PROP_RSP_SETBL_PARAM_HANDSHAKE |
+                            COMM_PROP_RSP_SETBL_PARAM_PARITY,
+      .ulSettableBaud     = COMM_PROP_RSP_BAUD_1200   |
+                            COMM_PROP_RSP_BAUD_1800   |
+                            COMM_PROP_RSP_BAUD_2400   |
+                            COMM_PROP_RSP_BAUD_4800   |
+                            COMM_PROP_RSP_BAUD_7200   |
+                            COMM_PROP_RSP_BAUD_9600   |
+                            COMM_PROP_RSP_BAUD_14400  |
+                            COMM_PROP_RSP_BAUD_19200  |
+                            COMM_PROP_RSP_BAUD_38400  |
+                            COMM_PROP_RSP_BAUD_56000  |
+                            COMM_PROP_RSP_BAUD_128000 |
+                            COMM_PROP_RSP_BAUD_115200 |
+                            COMM_PROP_RSP_BAUD_57600  |
+                            COMM_PROP_RSP_BAUD_OTHER,
+      .wSettableData      = COMM_PROP_RSP_SETBL_DATA_8,
+      .uniProvName        = "SILABS USB V2.0",
+    },
+    .flowCtrlState = {0},
+    .specChars     = {0},
+    .serialStatus  = {0},
+    /* Initialize UART/CDC Number */
+    .uart          = UART1,
+    .num           = USB_CDC0_NUM,
+  },
+  [USB_CDC1_NUM] =
   {
-    result = &gPortB;
-  }
+    /* Callbacks */
+    .epOBlkRd        = USBD_CDC_OEP_RdWsCb,
+    .epOBlkIsRxEmpty = USBD_CDC_OEP_IsRxEmpty,
+    .epIBlkWr        = USBD_CDC_IEP_WrWsCb,
+    .epIBlkIsTxEmpty = USBD_CDC_IEP_IsTxEmpty,
+    .rxFifoPutCb     = cdc_RxFifoPut,
+    .txFifoGetCb     = cdc_TxFifoGet,
+    /* Parameters */
+    .modemHandshake  = 0,
+    .modemStatus     = {0},
+    .rxComplete      = FW_FALSE,
+    .ready           = FW_FALSE,
+    /* During the enumeration the RTS and DTR lines should be disabled */
+    .powerOn         = FW_FALSE,
+    .setDtr          = FW_FALSE,
+    .setRts          = FW_FALSE,
+    /* FIFOs will be initialized during the startup later */
+    .pRxFifo         = NULL,
+    .pTxFifo         = NULL,
+    .rxBuffer        = {0},
+    .txBuffer        = {0},
+    .commProp =
+    {
+      .wLength            = sizeof(COMM_PROP_RSP_t),
+      .bcdVersion         = COMM_PROP_RSP_VERSION,
+      .ulServiceMask      = COMM_PROP_RSP_SVC_ID,
+      .ulMaxTxQueue       = USB_CDC_FIFO_SIZE,
+      .ulMaxRxQueue       = USB_CDC_FIFO_SIZE,
+      .ulMaxBaud          = 2000000,
+      .ulProvSubType      = COMM_PROP_RSP_PROV_SUB_TYPE_RS232,
+      .ulProvCapabilities = COMM_PROP_RSP_PROV_CAPABS_DTR_DSR |
+                            COMM_PROP_RSP_PROV_CAPABS_RTS_CTS |
+                            COMM_PROP_RSP_PROV_CAPABS_CHECK_PARITY,
+      .ulSettableParams   = COMM_PROP_RSP_SETBL_PARAM_PARITY_TYPE |
+                            COMM_PROP_RSP_SETBL_PARAM_BAUD |
+                            COMM_PROP_RSP_SETBL_PARAM_DATA_BITS |
+                            COMM_PROP_RSP_SETBL_PARAM_STOP_BITS |
+                            COMM_PROP_RSP_SETBL_PARAM_HANDSHAKE |
+                            COMM_PROP_RSP_SETBL_PARAM_PARITY,
+      .ulSettableBaud     = COMM_PROP_RSP_BAUD_1200   |
+                            COMM_PROP_RSP_BAUD_1800   |
+                            COMM_PROP_RSP_BAUD_2400   |
+                            COMM_PROP_RSP_BAUD_4800   |
+                            COMM_PROP_RSP_BAUD_7200   |
+                            COMM_PROP_RSP_BAUD_9600   |
+                            COMM_PROP_RSP_BAUD_14400  |
+                            COMM_PROP_RSP_BAUD_19200  |
+                            COMM_PROP_RSP_BAUD_38400  |
+                            COMM_PROP_RSP_BAUD_56000  |
+                            COMM_PROP_RSP_BAUD_128000 |
+                            COMM_PROP_RSP_BAUD_115200 |
+                            COMM_PROP_RSP_BAUD_57600  |
+                            COMM_PROP_RSP_BAUD_OTHER,
+      .wSettableData      = COMM_PROP_RSP_SETBL_DATA_8,
+      .uniProvName        = "SILABS USB V2.0",
+    },
+    .flowCtrlState = {0},
+    .specChars     = {0},
+    .serialStatus  = {0},
+    /* Initialize UART/CDC Number */
+    .uart          = UART2,
+    .num           = USB_CDC1_NUM,
+  },
+};
 
-  return (result);
-}
+static const U8 gPartNumber = CP210X_PARTNUM_CP2105;
 
 //-----------------------------------------------------------------------------
 /** @brief Gets DTR/RTS signals' state
@@ -696,32 +726,32 @@ static U8 * cdc_GetUartDtrRts(CDC_PORT * pPort)
 
 //-----------------------------------------------------------------------------
 /** @brief Gets COM Port status (rx/tx queue, errors, hold reasons)
- *  @param pPort - COM Port context
- *  @return Pointer to COM Port status structure
+ *  @param pCdc - CDC Port context
+ *  @return Pointer to CDC Port status structure
  */
 
-static U8 * cdc_GetUartStatus(CDC_PORT * pPort)
+static U8 * cdc_GetUartStatus(CDC_PORT * pCdc)
 {
   /* COM Port Rx/Tx Queue Status */
-  pPort->pSerialStatus->ulAmountInInQueue = FIFO_Count(pPort->pTxFifo);
-  pPort->pSerialStatus->ulAmountInOutQueue = FIFO_Count(pPort->pRxFifo);
+  pCdc->serialStatus.ulAmountInInQueue = FIFO_Count(pCdc->pTxFifo);
+  pCdc->serialStatus.ulAmountInOutQueue = FIFO_Count(pCdc->pRxFifo);
   /* Errors not implemented yet */
-  //pPort->pSerialStatus->ulErrors = 0;
-  //pPort->pSerialStatus->ulHoldReasons = 0;
+  //pCdc->pSerialStatus->ulErrors = 0;
+  //pCdc->pSerialStatus->ulHoldReasons = 0;
 
-  return (U8 *)pPort->pSerialStatus;
+  return (U8 *)&pCdc->serialStatus;
 }
 
 //-----------------------------------------------------------------------------
 /** @brief Sets COM Port Parameters
- *  @param pPort - COM Port context
+ *  @param pCdc - CDC Port context
  *  @return None
  */
 
-static void cdc_SetUartParameters(CDC_PORT * pPort, U16 aValue)
+static void cdc_SetUartParameters(CDC_PORT * pCdc, U16 aValue)
 {
   /* Not implemented yet */
-  (void)pPort;
+  (void)pCdc;
   (void)aValue;
   /* Stop bits, Parity, Word length */
   //pSetup->wValue.W & LINE_CTRL_STOP_BITS_MASK
@@ -731,53 +761,48 @@ static void cdc_SetUartParameters(CDC_PORT * pPort, U16 aValue)
 
 //-----------------------------------------------------------------------------
 /** @brief In/Deitializes the UART
- *  @param pPort - COM Port context
+ *  @param pCdc - CDC Port context
  *  @param aValue - 0 - deinitialize COM Port, else - Initialize COM Port
  *  @return None
  */
 
-static void cdc_SetUartEnabled(CDC_PORT * pPort, U16 aValue)
+static void cdc_SetUartEnabled(CDC_PORT * pCdc, U16 aValue)
 {
   /* COM Port Open/Close */
   if (0 == aValue)
   {
-    if (UART1 == pPort->uart)
+    /* COM Port Close */
+    if (UART1 == pCdc->uart)
     {
-      /* UART1: PA9 - Tx, PA10 - Rx, DTR - PB8, RTS - PB6 */
-      GPIO_Init(UART1_TX_PORT,  UART1_TX_PIN,  GPIO_TYPE_OUT_PP_10MHZ, 1);
-      GPIO_Init(UART1_RX_PORT,  UART1_RX_PIN,  GPIO_TYPE_IN_PUP_PDN,   1);
-      GPIO_Init(UART1_DTR_PORT, UART1_DTR_PIN, GPIO_TYPE_IN_ANALOG,    0);
-      GPIO_Init(UART1_RTS_PORT, UART1_RTS_PIN, GPIO_TYPE_IN_ANALOG,    0);
+      GPIO_Init(UART1_TX_PORT,  UART1_TX_PIN,  GPIO_TYPE_IN_ANALOG, 0);
+      GPIO_Init(UART1_RX_PORT,  UART1_RX_PIN,  GPIO_TYPE_IN_ANALOG, 0);
+      GPIO_Init(UART1_DTR_PORT, UART1_DTR_PIN, GPIO_TYPE_IN_ANALOG, 0);
+      GPIO_Init(UART1_RTS_PORT, UART1_RTS_PIN, GPIO_TYPE_IN_ANALOG, 0);
     }
     else
     {
-      /* UART2: PA2 - Tx, PA3 - Rx */
-      GPIO_Init(UART2_TX_PORT, UART2_TX_PIN, GPIO_TYPE_IN_PUP_PDN, 1);
-      GPIO_Init(UART2_RX_PORT, UART2_RX_PIN, GPIO_TYPE_IN_PUP_PDN, 1);
+      GPIO_Init(UART2_TX_PORT, UART2_TX_PIN, GPIO_TYPE_IN_ANALOG, 0);
+      GPIO_Init(UART2_RX_PORT, UART2_RX_PIN, GPIO_TYPE_IN_ANALOG, 0);
     }
-    UART_DeInit(pPort->uart);
-    pPort->ready = FW_FALSE;
+    UART_DeInit(pCdc->uart);
+    pCdc->ready = FW_FALSE;
     /* After the enumeration the RTS and DTR lines can be enabled */
-    pPort->powerOn = FW_TRUE;
+    pCdc->powerOn = FW_TRUE;
   }
   else
   {
-    if (UART1 == pPort->uart)
-    {
-      UART_Init
-      (
-        UART1,
-        gPortA.baudrate,
-        uart_FifoPutA,
-        uart_RxCompleteA,
-        uart_FifoGetA,
-        uart_TxCompleteA
-      );
+    /* COM Port Open */
+    UART_Init(pCdc->uart, pCdc->baudrate, pCdc->num);
+    UART_SetCB_RxByte(pCdc->uart, uart_FifoPut);
+    UART_SetCB_RxCmplt(pCdc->uart, uart_RxComplete);
+    UART_SetCB_TxByte(pCdc->uart, uart_FifoGet);
+    UART_SetCB_TxCmplt(pCdc->uart, uart_TxComplete);
 
-      /* UART1: PA9 - Tx, PA10 - Rx, DTR - PB8, RTS - PB6 */
-      GPIO_Init(UART1_TX_PORT,  UART1_TX_PIN,  GPIO_TYPE_ALT_PP_10MHZ, 1);
-      GPIO_Init(UART1_RX_PORT,  UART1_RX_PIN,  GPIO_TYPE_IN_PUP_PDN,   1);
-      if (FW_TRUE == pPort->powerOn)
+    if (UART1 == pCdc->uart)
+    {
+      GPIO_Init(UART1_TX_PORT, UART1_TX_PIN, GPIO_TYPE_ALT_PP_10MHZ, 1);
+      GPIO_Init(UART1_RX_PORT, UART1_RX_PIN, GPIO_TYPE_IN_PUP_PDN,   0);
+      if (FW_TRUE == pCdc->powerOn)
       {
         GPIO_Init(UART1_DTR_PORT, UART1_DTR_PIN, GPIO_TYPE_OUT_OD_10MHZ, 1);
         GPIO_Init(UART1_RTS_PORT, UART1_RTS_PIN, GPIO_TYPE_OUT_OD_10MHZ, 1);
@@ -785,73 +810,63 @@ static void cdc_SetUartEnabled(CDC_PORT * pPort, U16 aValue)
     }
     else
     {
-      UART_Init
-      (
-        UART2,
-        gPortB.baudrate,
-        uart_FifoPutB,
-        uart_RxCompleteB,
-        uart_FifoGetB,
-        uart_TxCompleteB
-      );
-
-      /* UART2: PA2 - Tx, PA3 - Rx */
       GPIO_Init(UART2_TX_PORT, UART2_TX_PIN, GPIO_TYPE_ALT_PP_10MHZ, 1);
-      GPIO_Init(UART2_RX_PORT, UART2_RX_PIN, GPIO_TYPE_IN_PUP_PDN,   1);
+      GPIO_Init(UART2_RX_PORT, UART2_RX_PIN, GPIO_TYPE_IN_PUP_PDN,   0);
     }
-    pPort->ready = FW_TRUE;
-    pPort->modemStatus.dtr = FW_FALSE;
-    pPort->modemStatus.rts = FW_FALSE;
-    pPort->modemStatus.cts = FW_TRUE;
-    pPort->modemStatus.dsr = FW_TRUE;
-    pPort->setDtr = FW_TRUE;
-    pPort->setRts = FW_TRUE;
-    UART_RxStart(pPort->uart);
+
+    pCdc->ready = FW_TRUE;
+    pCdc->modemStatus.dtr = FW_FALSE;
+    pCdc->modemStatus.rts = FW_FALSE;
+    pCdc->modemStatus.cts = FW_TRUE;
+    pCdc->modemStatus.dsr = FW_TRUE;
+    pCdc->setDtr = FW_TRUE;
+    pCdc->setRts = FW_TRUE;
+    UART_RxStart(pCdc->uart);
   }
 }
 
 //-----------------------------------------------------------------------------
 /** @brief Purges Rx/Tx buffers
- *  @param pPort - COM Port context
+ *  @param pCdc - CDC Port context
  *  @param aValue - Bitfield, identifies which buffer should be cleared
  *  @return None
  */
 
-static void cdc_UartPurge(CDC_PORT * pPort, U16 aValue)
+static void cdc_UartPurge(CDC_PORT * pCdc, U16 aValue)
 {
   if (0 != (aValue & (PURGE_CLEAR_TX_QUEUE1 | PURGE_CLEAR_TX_QUEUE2)))
   {
-    FIFO_Clear(pPort->pTxFifo);
+    FIFO_Clear(pCdc->pTxFifo);
   }
 
   if (0 != (aValue & (PURGE_CLEAR_RX_QUEUE1 | PURGE_CLEAR_RX_QUEUE2)))
   {
-    FIFO_Clear(pPort->pRxFifo);
+    FIFO_Clear(pCdc->pRxFifo);
   }
 }
 
 //-----------------------------------------------------------------------------
 /** @brief Sets DTR/RTS signals
- *  @param pPort - COM Port context
+ *  @param pCdc - CDC Port context
  *  @param aValue - DTR/RTS signals state
  *  @return None
  */
 
-static void cdc_SetUartDtrRts(CDC_PORT * pPort, U16 aValue)
+static void cdc_SetUartDtrRts(CDC_PORT * pCdc, U16 aValue)
 {
   FW_BOOLEAN value = FW_FALSE;
 
-  pPort->modemHandshake = aValue;
+  pCdc->modemHandshake = aValue;
 
-  if (UART1 != pPort->uart) return;
+  if (UART1 != pCdc->uart) return;
 
   if (0 != (aValue & MODEM_HANDSHAKE_STATE_DTR_EN))
   {
     value = (FW_BOOLEAN)(0 < (aValue & MODEM_HANDSHAKE_STATE_DTR));
-    pPort->modemStatus.dtr = value;
-    pPort->setDtr ^= FW_TRUE;
+    pCdc->modemStatus.dtr = value;
+    pCdc->setDtr ^= FW_TRUE;
 
-    if (FW_TRUE == pPort->setDtr)
+    if (FW_TRUE == pCdc->setDtr)
     {
       if (FW_FALSE == value)
       {
@@ -869,10 +884,10 @@ static void cdc_SetUartDtrRts(CDC_PORT * pPort, U16 aValue)
   if (0 != (aValue & MODEM_HANDSHAKE_STATE_RTS_EN))
   {
     value = (FW_BOOLEAN)(0 < (aValue & MODEM_HANDSHAKE_STATE_RTS));
-    pPort->modemStatus.rts = value;
-    pPort->setRts ^= FW_TRUE;
+    pCdc->modemStatus.rts = value;
+    pCdc->setRts ^= FW_TRUE;
 
-    if (FW_TRUE == pPort->setRts)
+    if (FW_TRUE == pCdc->setRts)
     {
       if (FW_FALSE == value)
       {
@@ -890,13 +905,13 @@ static void cdc_SetUartDtrRts(CDC_PORT * pPort, U16 aValue)
 
 //-----------------------------------------------------------------------------
 /** @brief Sets COM Port BaudRate
- *  @param pPort - COM Port context
+ *  @param pCdc - CDC Port context
  *  @return None
  */
 
-static void cdc_SetUartBaudrate(CDC_PORT * pPort)
+static void cdc_SetUartBaudrate(CDC_PORT * pCdc)
 {
-  UART_SetBaudrate(pPort->uart, pPort->baudrate);
+  UART_SetBaudrate(pCdc->uart, pCdc->baudrate);
 }
 
 //-----------------------------------------------------------------------------
@@ -918,7 +933,7 @@ USB_CTRL_STAGE CDC_CtrlSetupReq
 )
 {
   USB_CTRL_STAGE result = USB_CTRL_STAGE_ERROR;
-  CDC_PORT * port = cdc_GetPort(pSetup->wIndex.W);
+  CDC_PORT * pCdc = &gCdcPort[USBD_CDC_GetPortNumber(pSetup->wIndex.W)];
 
   switch (pSetup->bRequest)
   {
@@ -926,19 +941,19 @@ USB_CTRL_STAGE CDC_CtrlSetupReq
 
     case CDC_REQ_GET_PROPS:
       CDC_LOG(" - Get Props\r\n");
-      *pData = (U8 *)port->pCommProp;
+      *pData = (U8 *)&pCdc->commProp;
       result = USB_CTRL_STAGE_DATA;
       break;
 
     case CDC_REQ_GET_MDMSTS:
       CDC_LOG(" - Get Modem Status\r\n");
-      *pData = cdc_GetUartDtrRts(port);
+      *pData = cdc_GetUartDtrRts(pCdc);
       result = USB_CTRL_STAGE_DATA;
       break;
 
     case CDC_REQ_GET_COMM_STATUS:
       CDC_LOG(" - Get Serial Status\r\n");
-      *pData = cdc_GetUartStatus(port);
+      *pData = cdc_GetUartStatus(pCdc);
       result = USB_CTRL_STAGE_DATA;
       break;
 
@@ -952,25 +967,25 @@ USB_CTRL_STAGE CDC_CtrlSetupReq
         (pSetup->wValue.W & LINE_CTRL_PARITY_MASK) >> LINE_CTRL_PARITY_POS,
         (pSetup->wValue.W & LINE_CTRL_WORD_LEN_MASK) >> LINE_CTRL_WORD_LEN_POS
       );
-      cdc_SetUartParameters(port, pSetup->wValue.W);
+      cdc_SetUartParameters(pCdc, pSetup->wValue.W);
       result = USB_CTRL_STAGE_STATUS;
       break;
 
     case CDC_REQ_IFC_ENABLE:
       CDC_LOG(" - Port %d Enable = %d\r\n", port->uart, pSetup->wValue.W);
-      cdc_SetUartEnabled(port, pSetup->wValue.W);
+      cdc_SetUartEnabled(pCdc, pSetup->wValue.W);
       result = USB_CTRL_STAGE_STATUS;
       break;
 
     case CDC_REQ_PURGE:
       CDC_LOG(" - Purge - 0x%04X\r\n", pSetup->wValue.W);
-      cdc_UartPurge(port, pSetup->wValue.W);
+      cdc_UartPurge(pCdc, pSetup->wValue.W);
       result = USB_CTRL_STAGE_STATUS;
       break;
 
     case CDC_REQ_SET_MHS:
       CDC_LOG(" - Set Mdm Handshake = 0x%04X\r\n", pSetup->wValue.W);
-      cdc_SetUartDtrRts(port, pSetup->wValue.W);
+      cdc_SetUartDtrRts(pCdc, pSetup->wValue.W);
       result = USB_CTRL_STAGE_STATUS;
       break;
 
@@ -979,19 +994,19 @@ USB_CTRL_STAGE CDC_CtrlSetupReq
     case CDC_REQ_SET_FLOW:
       CDC_LOG(" - Set Flow Control State\r\n");
       /* DTR/RTS operation mode: hardcoded as staticaly active both */
-      *pData = (U8 *)port->pFlowCtrlState;
+      *pData = (U8 *)&pCdc->flowCtrlState;
       result = USB_CTRL_STAGE_WAIT;
       break;
 
     case CDC_REQ_SET_CHARS:
       CDC_LOG(" - Set Spec Chars\r\n");
-      *pData = (U8 *)port->pSpecChars;
+      *pData = (U8 *)&pCdc->specChars;
       result = USB_CTRL_STAGE_WAIT;
       break;
 
     case CDC_REQ_SET_BAUDRATE:
       CDC_LOG(" - Set Baud Rate\r\n");
-      *pData = (U8 *)&port->baudrate;
+      *pData = (U8 *)&pCdc->baudrate;
       result = USB_CTRL_STAGE_WAIT;
       break;
 
@@ -1060,7 +1075,7 @@ USB_CTRL_STAGE CDC_CtrlOutReq
 )
 {
   USB_CTRL_STAGE result = USB_CTRL_STAGE_ERROR;
-  CDC_PORT * port = cdc_GetPort(pSetup->wIndex.W);
+  CDC_PORT * pCdc = &gCdcPort[USBD_CDC_GetPortNumber(pSetup->wIndex.W)];
 #ifdef CDC_DEBUG
       U32 ctrlHndshake, flowReplace;
 #endif /* CDC_DEBUG */
@@ -1069,11 +1084,11 @@ USB_CTRL_STAGE CDC_CtrlOutReq
   {
     case CDC_REQ_SET_FLOW:
 #ifdef CDC_DEBUG
-      ctrlHndshake = port->pFlowCtrlState->ulControlHandshake;
+      ctrlHndshake = pCdc->pFlowCtrlState->ulControlHandshake;
       ctrlHndshake &= FLOW_CTRL_HDSHAKE_DTR_MASK;
       ctrlHndshake >>= FLOW_CTRL_HDSHAKE_DTR_POS;
 
-      flowReplace = port->pFlowCtrlState->ulFlowReplace;
+      flowReplace = pCdc->pFlowCtrlState->ulFlowReplace;
       flowReplace &= FLOW_CTRL_REPLACE_RTS_MASK;
       flowReplace >>= FLOW_CTRL_REPLACE_RTS_POS;
 #endif /* CDC_DEBUG */
@@ -1100,7 +1115,7 @@ USB_CTRL_STAGE CDC_CtrlOutReq
 
     case CDC_REQ_SET_BAUDRATE:
       CDC_LOG(" --- Velue = %d\r\n", port->baudrate);
-      cdc_SetUartBaudrate(port);
+      cdc_SetUartBaudrate(pCdc);
       result = USB_CTRL_STAGE_STATUS;
       break;
 
@@ -1119,63 +1134,68 @@ USB_CTRL_STAGE CDC_CtrlOutReq
 
 //-----------------------------------------------------------------------------
 /** @brief Processes OUT EP data (Rx via USB)
- *  @param pPort - Pointer to Port context
+ *  @param pCdc - Pointer to CDC Port context
  *  @return None
  */
 
-static void cdc_OutStage(CDC_PORT * pPort)
+static void cdc_OutStage(CDC_PORT * pCdc)
 {
   /* Read from OUT EP */
-  (void)pPort->epOBlkRd(pPort->rxFifoPutCb, FIFO_Free(pPort->pRxFifo));
+  (void)pCdc->epOBlkRd(pCdc->num, pCdc->rxFifoPutCb, FIFO_Free(pCdc->pRxFifo));
 
   /* Write to UART */
-  if (0 < FIFO_Count(pPort->pRxFifo))
+  if (0 < FIFO_Count(pCdc->pRxFifo))
   {
-    UART_TxStart(pPort->uart);
+    UART_TxStart(pCdc->uart);
   }
 }
 
 //-----------------------------------------------------------------------------
 /** @brief Processes IN EP data (Tx via USB)
- *  @param pPort - Pointer to Port context
+ *  @param pCdc - Pointer to CDC Port context
  *  @return None
  */
 
-static void cdc_InStage(CDC_PORT * pPort)
+static void cdc_InStage(CDC_PORT * pCdc)
 {
   /* If there are some data in FIFO */
-  if (0 < FIFO_Count(pPort->pTxFifo))
+  if (0 < FIFO_Count(pCdc->pTxFifo))
   {
     /* Write to IN EP */
-    (void)pPort->epIBlkWr(pPort->txFifoGetCb, FIFO_Count(pPort->pTxFifo));
+    (void)pCdc->epIBlkWr
+    (
+      pCdc-> num,
+      pCdc->txFifoGetCb,
+      FIFO_Count(pCdc->pTxFifo)
+    );
   }
   else
   {
-    pPort->rxComplete = FW_FALSE;
+    pCdc->rxComplete = FW_FALSE;
   }
 }
 
 //-----------------------------------------------------------------------------
 /** @brief Processes Rx/Tx data if present in I/O Buffers
- *  @param pPort - Pointer to the Port context
+ *  @param pCdc - Pointer to the CDC Port context
  *  @return None
  */
 
-static void cdc_ProcessCollectedData(CDC_PORT * pPort)
+static void cdc_ProcessCollectedData(CDC_PORT * pCdc)
 {
   /* Check if there are some unprocessed data */
-  if (FW_TRUE == pPort->ready)
+  if (FW_TRUE == pCdc->ready)
   {
-    if (FW_FALSE == pPort->epOBlkIsRxEmpty())
+    if (FW_FALSE == pCdc->epOBlkIsRxEmpty(pCdc->num))
     {
-      cdc_OutStage(pPort);
+      cdc_OutStage(pCdc);
     }
 
-    if (((FW_TRUE == pPort->rxComplete) ||
-         (USB_CDC_PACKET_SIZE < FIFO_Count(pPort->pTxFifo))) &&
-        (FW_TRUE == pPort->epIBlkIsTxEmpty()))
+    if (((FW_TRUE == pCdc->rxComplete) ||
+         (USB_CDC_PACKET_SIZE < FIFO_Count(pCdc->pTxFifo))) &&
+        (FW_TRUE == pCdc->epIBlkIsTxEmpty(pCdc->num)))
     {
-      cdc_InStage(pPort);
+      cdc_InStage(pCdc);
     }
   }
 }
@@ -1188,184 +1208,115 @@ static void cdc_ProcessCollectedData(CDC_PORT * pPort)
 
 void CDC_SOF(void)
 {
-  cdc_ProcessCollectedData(&gPortA);
-  cdc_ProcessCollectedData(&gPortB);
+  USB_CDC_NUM num = USB_CDC0_NUM;
+
+  for (num = USB_CDC0_NUM; num < USB_CDC_CNT; num++)
+  {
+    cdc_ProcessCollectedData(&gCdcPort[num]);
+  }
 }
 
 //-----------------------------------------------------------------------------
 /** @brief CDC Bulk In Callback
+ *  @param aParam - Optional parameter, equals to CDC number (set in the
+ *                  USBD_INTERFACE_CALLBACKS_DESCRIPTOR structure, Param field)
  *  @param aEvent - Event
  *  @return None
  */
 
-void CDC_BulkAIn(U32 aEvent)
+void CDC_BulkI(U32 aParam, U32 aEvent)
 {
-  cdc_InStage(&gPortA);
+  cdc_InStage(&gCdcPort[aParam]);
 }
 
 //-----------------------------------------------------------------------------
 /** @brief CDC Bulk Out Callback
+ *  @param aParam - Optional parameter, equals to CDC number (set in the
+ *                  USBD_INTERFACE_CALLBACKS_DESCRIPTOR structure, Param field)
  *  @param aEvent - Event
  *  @return None
  */
 
-void CDC_BulkAOut(U32 aEvent)
+void CDC_BulkO(U32 aParam, U32 aEvent)
 {
-  cdc_OutStage(&gPortA);
+  cdc_OutStage(&gCdcPort[aParam]);
 }
 
 //-----------------------------------------------------------------------------
 /** @brief Puts received Byte from USB EP buffer to the Rx FIFO
+ *  @param aParam - Optional parameter, equals to CDC number (set in the
+ *                  USBD_INTERFACE_CALLBACKS_DESCRIPTOR structure, Param field)
  *  @param pByte - Pointer to the container for Byte
  *  @return None
  */
 
-static void cdc_RxFifoPutA(U8 * pByte)
+static void cdc_RxFifoPut(U32 aParam, U8 * pByte)
 {
-  (void)FIFO_Put(gPortA.pRxFifo, pByte);
+  (void)FIFO_Put(gCdcPort[aParam].pRxFifo, pByte);
 }
 
 //-----------------------------------------------------------------------------
 /** @brief Gets Byte that need to be transmitted from the Tx FIFO
+ *  @param aParam - Optional parameter, equals to CDC number (set in the
+ *                  USBD_INTERFACE_CALLBACKS_DESCRIPTOR structure, Param field)
  *  @param pByte - Pointer to the container for Byte
  *  @return None
  */
 
-static void cdc_TxFifoGetA(U8 * pByte)
+static void cdc_TxFifoGet(U32 aParam, U8 * pByte)
 {
-  (void)FIFO_Get(gPortA.pTxFifo, pByte);
+  (void)FIFO_Get(gCdcPort[aParam].pTxFifo, pByte);
 }
 
 //-----------------------------------------------------------------------------
 /** @brief Puts received Byte from UART to the Tx FIFO
+ *  @param aParam - Optional parameter, equals to CDC number (set in the
+ *                  UART_Init function)
  *  @param pByte - Pointer to the container for Byte
  *  @return TRUE if byte has been put successfully
  */
 
-static FW_BOOLEAN uart_FifoPutA(U8 * pByte)
+static FW_BOOLEAN uart_FifoPut(U32 aParam, U8 * pByte)
 {
-  return (FW_BOOLEAN)(FW_SUCCESS == FIFO_Put(gPortA.pTxFifo, pByte));
+  return (FW_BOOLEAN)(FW_SUCCESS == FIFO_Put(gCdcPort[aParam].pTxFifo, pByte));
 }
 
 //-----------------------------------------------------------------------------
 /** @brief Receive complete callback
+ *  @param aParam - Optional parameter, equals to CDC number (set in the
+ *                  UART_Init function)
  *  @param pByte - Optional pointer to the latest received byte (def. NULL)
  *  @return TRUE, that means UART line idle is received
  */
 
-static FW_BOOLEAN uart_RxCompleteA(U8 * pByte)
+static FW_BOOLEAN uart_RxComplete(U32 aParam, U8 * pByte)
 {
-  gPortA.rxComplete = FW_TRUE;
+  gCdcPort[aParam].rxComplete = FW_TRUE;
   return FW_TRUE;
 }
 
 //-----------------------------------------------------------------------------
 /** @brief Gets Byte that need to be transmitted from the Rx FIFO
+ *  @param aParam - Optional parameter, equals to CDC number (set in the
+ *                  UART_Init function)
  *  @param pByte - Pointer to the container for Byte
  *  @return TRUE if byte has been gotten successfully
  */
 
-static FW_BOOLEAN uart_FifoGetA(U8 * pByte)
+static FW_BOOLEAN uart_FifoGet(U32 aParam, U8 * pByte)
 {
-  return (FW_BOOLEAN)(FW_SUCCESS == FIFO_Get(gPortA.pRxFifo, pByte));
+  return (FW_BOOLEAN)(FW_SUCCESS == FIFO_Get(gCdcPort[aParam].pRxFifo, pByte));
 }
 
 //-----------------------------------------------------------------------------
 /** @brief Transmit complete callback
+ *  @param aParam - Optional parameter, equals to CDC number (set in the
+ *                  UART_Init function)
  *  @param pByte - Optional pointer to the latest received byte (def. NULL)
  *  @return TRUE, that means UART transmission is complete
  */
 
-static FW_BOOLEAN uart_TxCompleteA(U8 * pByte)
-{
-  return FW_TRUE;
-}
-
-//-----------------------------------------------------------------------------
-/** @brief CDC Bulk In Callback
- *  @param aEvent - Event
- *  @return None
- */
-
-void CDC_BulkBIn(U32 aEvent)
-{
-  cdc_InStage(&gPortB);
-}
-
-//-----------------------------------------------------------------------------
-/** @brief CDC Bulk Out Callback
- *  @param aEvent - Event
- *  @return None
- */
-
-void CDC_BulkBOut(U32 aEvent)
-{
-  cdc_OutStage(&gPortB);
-}
-
-//-----------------------------------------------------------------------------
-/** @brief Puts received Byte from USB EP buffer to the Rx FIFO
- *  @param pByte - Pointer to the container for Byte
- *  @return None
- */
-
-static void cdc_RxFifoPutB(U8 * pByte)
-{
-  (void)FIFO_Put(gPortB.pRxFifo, pByte);
-}
-
-//-----------------------------------------------------------------------------
-/** @brief Gets Byte that need to be transmitted from the Tx FIFO
- *  @param pByte - Pointer to the container for Byte
- *  @return None
- */
-
-static void cdc_TxFifoGetB(U8 * pByte)
-{
-  (void)FIFO_Get(gPortB.pTxFifo, pByte);
-}
-
-//-----------------------------------------------------------------------------
-/** @brief Puts received Byte from UART to the Tx FIFO
- *  @param pByte - Pointer to the container for Byte
- *  @return TRUE if byte has been put successfully
- */
-
-static FW_BOOLEAN uart_FifoPutB(U8 * pByte)
-{
-  return (FW_BOOLEAN)(FW_SUCCESS == FIFO_Put(gPortB.pTxFifo, pByte));
-}
-
-//-----------------------------------------------------------------------------
-/** @brief Receive complete callback
- *  @param pByte - Optional pointer to the latest received byte (def. NULL)
- *  @return TRUE, that means UART line idle received
- */
-
-static FW_BOOLEAN uart_RxCompleteB(U8 * pByte)
-{
-  gPortB.rxComplete = FW_TRUE;
-  return FW_TRUE;
-}
-
-//-----------------------------------------------------------------------------
-/** @brief Gets Byte that need to be transmitted from the Rx FIFO
- *  @param pByte - Pointer to the container for Byte
- *  @return None
- */
-
-static FW_BOOLEAN uart_FifoGetB(U8 * pByte)
-{
-  return (FW_BOOLEAN)(FW_SUCCESS == FIFO_Get(gPortB.pRxFifo, pByte));
-}
-
-//-----------------------------------------------------------------------------
-/** @brief Transmit complete callback
- *  @param pByte - Optional pointer to the latest received byte (def. NULL)
- *  @return TRUE, that means UART transmission is complete
- */
-
-static FW_BOOLEAN uart_TxCompleteB(U8 * pByte)
+static FW_BOOLEAN uart_TxComplete(U32 aParam, U8 * pByte)
 {
   return FW_TRUE;
 }
@@ -1378,53 +1329,16 @@ static FW_BOOLEAN uart_TxCompleteB(U8 * pByte)
 
 void CDC_Init(void)
 {
-  /* Clear Port context */
-  memset(&gPortA, 0, sizeof(gPortA));
-  /* Port is not ready yet */
-  gPortA.ready = FW_FALSE;
-  gPortA.rxComplete = FW_FALSE;
-  /* During the enumeration the RTS and DTR lines should be disabled */
-  gPortA.powerOn = FW_FALSE;
-  /* Initialize Endpoints */
-  gPortA.epOBlkRd        = USBD_CDC_OEndPointRdWsCb;
-  gPortA.epOBlkIsRxEmpty = USBD_CDC_OEndPointIsRxEmpty;
-  gPortA.epIBlkWr        = USBD_CDC_IEndPointWrWsCb;
-  gPortA.epIBlkIsTxEmpty = USBD_CDC_IEndPointIsTxEmpty;
-  /* Initialize FIFOs */
-  gPortA.pRxFifo = FIFO_Init(gPortA.rxBuffer, sizeof(gPortA.rxBuffer));
-  gPortA.pTxFifo = FIFO_Init(gPortA.txBuffer, sizeof(gPortA.txBuffer));
-  gPortA.rxFifoPutCb = cdc_RxFifoPutA;
-  gPortA.txFifoGetCb = cdc_TxFifoGetA;
-  /* Initialize pointers */
-  gPortA.pCommProp = &gCommPropA;
-  gPortA.pFlowCtrlState = &gFlowCtrlStateA;
-  gPortA.pSpecChars = &gSpecCharsA;
-  gPortA.pSerialStatus = &gSerialStatusA;
-  /* Initialize UART Number */
-  gPortA.uart = UART1;
+  USB_CDC_NUM num = USB_CDC0_NUM;
+  CDC_PORT * pCdc = NULL;
 
-  /* Clear Port context */
-  memset(&gPortB, 0, sizeof(gPortB));
-  /* Port is not ready yet */
-  gPortB.ready = FW_FALSE;
-  gPortB.rxComplete = FW_FALSE;
-  /* During the enumeration the RTS and DTR lines should be disabled */
-  gPortB.powerOn = FW_FALSE;
-  /* Initialize Endpoints */
-  gPortB.epOBlkRd        = USBD_CDD_OEndPointRdWsCb;
-  gPortB.epOBlkIsRxEmpty = USBD_CDD_OEndPointIsRxEmpty;
-  gPortB.epIBlkWr        = USBD_CDD_IEndPointWrWsCb;
-  gPortB.epIBlkIsTxEmpty = USBD_CDD_IEndPointIsTxEmpty;
   /* Initialize FIFOs */
-  gPortB.pRxFifo = FIFO_Init(gPortB.rxBuffer, sizeof(gPortB.rxBuffer));
-  gPortB.pTxFifo = FIFO_Init(gPortB.txBuffer, sizeof(gPortB.txBuffer));
-  gPortB.rxFifoPutCb = cdc_RxFifoPutB;
-  gPortB.txFifoGetCb = cdc_TxFifoGetB;
-  /* Initialize pointers */
-  gPortB.pCommProp = &gCommPropB;
-  gPortB.pFlowCtrlState = &gFlowCtrlStateB;
-  gPortB.pSpecChars = &gSpecCharsB;
-  gPortB.pSerialStatus = &gSerialStatusB;
-  /* Initialize UART Number */
-  gPortB.uart = UART2;
+  for (num = USB_CDC0_NUM; num < USB_CDC_CNT; num++)
+  {
+    pCdc = &gCdcPort[num];
+    pCdc->pRxFifo = FIFO_Init(pCdc->rxBuffer, sizeof(pCdc->rxBuffer));
+    pCdc->pTxFifo = FIFO_Init(pCdc->txBuffer, sizeof(pCdc->txBuffer));
+  }
 }
+
+//-----------------------------------------------------------------------------

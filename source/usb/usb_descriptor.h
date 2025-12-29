@@ -4,18 +4,23 @@
 #include "usb_descriptor_definitions.h"
 #include "usb_device.h"
 
+/* -------------------------------------------------------------------------- */
+
+typedef enum
+{
+  USB_CDC0_NUM = 0,
+  USB_CDC1_NUM,
+  USB_CDC_CNT
+} USB_CDC_NUM;
+
 /* --- Class Specific Optional Function Prototypes -------------------------- */
 
-U8         USBD_CDC_GetInterfaceNumber (void);
-U32        USBD_CDC_IEndPointWrWsCb    (USBD_CbByte pGetByteCb, U32 aSize);
-FW_BOOLEAN USBD_CDC_IEndPointIsTxEmpty (void);
-U32        USBD_CDC_OEndPointRdWsCb    (USBD_CbByte pPutByteCb, U32 aSize);
-FW_BOOLEAN USBD_CDC_OEndPointIsRxEmpty (void);
+USB_CDC_NUM USBD_CDC_GetPortNumber(U16 aIfcIdx);
+U32 USBD_CDC_IEP_WrWsCb(USB_CDC_NUM aCdcNum, USBD_CbByte pGetByteCb, U32 aSize);
+FW_BOOLEAN USBD_CDC_IEP_IsTxEmpty(USB_CDC_NUM aCdcNum);
+U32 USBD_CDC_OEP_RdWsCb(USB_CDC_NUM aCdcNum, USBD_CbByte pPutByteCb, U32 aSize);
+FW_BOOLEAN USBD_CDC_OEP_IsRxEmpty(USB_CDC_NUM aCdcNum);
 
-U8         USBD_CDD_GetInterfaceNumber (void);
-U32        USBD_CDD_IEndPointWrWsCb    (USBD_CbByte pGetByteCb, U32 aSize);
-FW_BOOLEAN USBD_CDD_IEndPointIsTxEmpty (void);
-U32        USBD_CDD_OEndPointRdWsCb    (USBD_CbByte pPutByteCb, U32 aSize);
-FW_BOOLEAN USBD_CDD_OEndPointIsRxEmpty (void);
+/* -------------------------------------------------------------------------- */
 
 #endif  /* __USB_DESCRIPTOR_H__ */

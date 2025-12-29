@@ -14,8 +14,8 @@ typedef enum
   STR_DESCRIPTOR_IDX_LANG_ID = 0,   /* Language ID */
   STR_DESCRIPTOR_IDX_MANUFACTURER,  /* iManufacturer */
   STR_DESCRIPTOR_IDX_PRODUCT,       /* iProduct */
-  STR_DESCRIPTOR_IDX_CDC,
-  STR_DESCRIPTOR_IDX_CDD,
+  STR_DESCRIPTOR_IDX_CDC0,
+  STR_DESCRIPTOR_IDX_CDC1,
   STR_DESCRIPTOR_IDX_SERIAL_NUMBER, /* iSerialNumber */
   /* Strings count */
   STR_DESCRIPTOR_IDX_CNT
@@ -23,8 +23,8 @@ typedef enum
 
 typedef enum
 {
-  USB_INTERFACE_IDX_CDC = 0,
-  USB_INTERFACE_IDX_CDD,
+  USB_INTERFACE_IDX_CDC0 = 0,
+  USB_INTERFACE_IDX_CDC1,
   /* Interfaces count */
   USB_INTERFACE_IDX_CNT
 } USB_INTERFACE_IDX;
@@ -32,8 +32,8 @@ typedef enum
 typedef enum
 {
   USB_ENDPOINT_IDX_CTRL = 0,
-  USB_ENDPOINT_IDX_CDC,
-  USB_ENDPOINT_IDX_CDD,
+  USB_ENDPOINT_IDX_CDC0,
+  USB_ENDPOINT_IDX_CDC1,
   /* Endpoints count */
   USB_ENDPOINT_IDX_CNT
 } USB_ENDPOINT_IDX;
@@ -81,48 +81,48 @@ static const U8 USB_ConfigDescriptor[] =
 /* Interface 0, Alternate Setting 0, Vendor Specific Class */
   USB_INTERFACE_DESCRIPTOR_SIZE,         /* bLength */
   USB_INTERFACE_DESCRIPTOR_TYPE,         /* bDescriptorType */
-  USB_INTERFACE_IDX_CDC,                 /* bInterfaceNumber */
+  USB_INTERFACE_IDX_CDC0,                /* bInterfaceNumber */
   0x00,                                  /* bAlternateSetting */
   0x02,                                  /* bNumEndpoints */
   USB_DEVICE_CLASS_VENDOR_SPECIFIC,      /* bInterfaceClass */
   CDC_IF_SUBCLASS_NONE,                  /* bInterfaceSubClass */
   CDC_IF_PROTOCOL_NONE,                  /* bInterfaceProtocol */
-  STR_DESCRIPTOR_IDX_CDC,                /* iInterface */
+  STR_DESCRIPTOR_IDX_CDC0,               /* iInterface */
 /* Bulk In Endpoint */
   USB_ENDPOINT_DESCRIPTOR_SIZE,          /* bLength */
   USB_ENDPOINT_DESCRIPTOR_TYPE,          /* bDescriptorType */
-  USB_ENDPOINT_I(USB_ENDPOINT_IDX_CDC),  /* bEndpointAddress */
+  USB_ENDPOINT_I(USB_ENDPOINT_IDX_CDC0), /* bEndpointAddress */
   USB_ENDPOINT_TYPE_BULK,                /* bmAttributes */
   WBVAL(USB_CDC_PACKET_SIZE),            /* wMaxPacketSize */
   0,                                     /* bInterval */
 /* Bulk Out Endpoint */
   USB_ENDPOINT_DESCRIPTOR_SIZE,          /* bLength */
   USB_ENDPOINT_DESCRIPTOR_TYPE,          /* bDescriptorType */
-  USB_ENDPOINT_O(USB_ENDPOINT_IDX_CDC),  /* bEndpointAddress */
+  USB_ENDPOINT_O(USB_ENDPOINT_IDX_CDC0), /* bEndpointAddress */
   USB_ENDPOINT_TYPE_BULK,                /* bmAttributes */
   WBVAL(USB_CDC_PACKET_SIZE),            /* wMaxPacketSize */
   0,                                     /* bInterval */
 /* Interface 1, Alternate Setting 0, Vendor Specific Class */
   USB_INTERFACE_DESCRIPTOR_SIZE,         /* bLength */
   USB_INTERFACE_DESCRIPTOR_TYPE,         /* bDescriptorType */
-  USB_INTERFACE_IDX_CDD,                 /* bInterfaceNumber */
+  USB_INTERFACE_IDX_CDC1,                /* bInterfaceNumber */
   0x00,                                  /* bAlternateSetting */
   0x02,                                  /* bNumEndpoints */
   USB_DEVICE_CLASS_VENDOR_SPECIFIC,      /* bInterfaceClass */
   CDC_IF_SUBCLASS_NONE,                  /* bInterfaceSubClass */
   CDC_IF_PROTOCOL_NONE,                  /* bInterfaceProtocol */
-  STR_DESCRIPTOR_IDX_CDD,                /* iInterface */
+  STR_DESCRIPTOR_IDX_CDC1,               /* iInterface */
 /* Bulk In Endpoint */
   USB_ENDPOINT_DESCRIPTOR_SIZE,          /* bLength */
   USB_ENDPOINT_DESCRIPTOR_TYPE,          /* bDescriptorType */
-  USB_ENDPOINT_I(USB_ENDPOINT_IDX_CDD),  /* bEndpointAddress */
+  USB_ENDPOINT_I(USB_ENDPOINT_IDX_CDC1), /* bEndpointAddress */
   USB_ENDPOINT_TYPE_BULK,                /* bmAttributes */
   WBVAL(USB_CDC_PACKET_SIZE),            /* wMaxPacketSize */
   0,                                     /* bInterval */
 /* Bulk Out Endpoint */
   USB_ENDPOINT_DESCRIPTOR_SIZE,          /* bLength */
   USB_ENDPOINT_DESCRIPTOR_TYPE,          /* bDescriptorType */
-  USB_ENDPOINT_O(USB_ENDPOINT_IDX_CDD),  /* bEndpointAddress */
+  USB_ENDPOINT_O(USB_ENDPOINT_IDX_CDC1), /* bEndpointAddress */
   USB_ENDPOINT_TYPE_BULK,                /* bmAttributes */
   WBVAL(USB_CDC_PACKET_SIZE),            /* wMaxPacketSize */
   0,                                     /* bInterval */
@@ -214,7 +214,7 @@ static const U8 usbd_StrDescriptor_SerialNumber[] =
   '3',0,
 };
 
-static const U8 usbd_StrDescriptor_CDC[] =
+static const U8 usbd_StrDescriptor_CDC0[] =
 {
   0x24,                                  /* bLength */
   USB_STRING_DESCRIPTOR_TYPE,            /* bDescriptorType */
@@ -237,7 +237,7 @@ static const U8 usbd_StrDescriptor_CDC[] =
   't',0,
 };
 
-static const U8 usbd_StrDescriptor_CDD[] =
+static const U8 usbd_StrDescriptor_CDC1[] =
 {
   0x24,                                  /* bLength */
   USB_STRING_DESCRIPTOR_TYPE,            /* bDescriptorType */
@@ -265,8 +265,8 @@ static const U8 * usbd_StrDescriptor[STR_DESCRIPTOR_IDX_CNT] =
   usbd_StrDescriptor_LanguageId,
   usbd_StrDescriptor_Manufacturer,
   usbd_StrDescriptor_Product,
-  usbd_StrDescriptor_CDC,
-  usbd_StrDescriptor_CDD,
+  usbd_StrDescriptor_CDC0,
+  usbd_StrDescriptor_CDC1,
   usbd_StrDescriptor_SerialNumber,
 };
 
@@ -324,118 +324,86 @@ U8 USBD_GetItrfacesCount(void)
 const USBD_INTERFACE_CALLBACKS_DESCRIPTOR
       USBD_IfCbDescriptor[USB_INTERFACE_IDX_CNT] =
 {
-  [USB_INTERFACE_IDX_CDC] =
+  [USB_INTERFACE_IDX_CDC0] =
   {
     .CbInit      = CDC_Init,
     .CbCtrlSetup = CDC_CtrlSetupReq,
     .CbCtrlOut   = CDC_CtrlOutReq,
     .CbSOF       = CDC_SOF,
-    .CbEndPointI = CDC_BulkAIn,
-    .CbEndPointO = CDC_BulkAOut,
-    .EndPointI   = USB_ENDPOINT_I(USB_ENDPOINT_IDX_CDC),
-    .EndPointO   = USB_ENDPOINT_O(USB_ENDPOINT_IDX_CDC),
+    .CbEndPointI = CDC_BulkI,
+    .CbEndPointO = CDC_BulkO,
+    .Param       = USB_CDC0_NUM,
+    .EndPointI   = USB_ENDPOINT_I(USB_ENDPOINT_IDX_CDC0),
+    .EndPointO   = USB_ENDPOINT_O(USB_ENDPOINT_IDX_CDC0),
   },
-  [USB_INTERFACE_IDX_CDD] =
+  [USB_INTERFACE_IDX_CDC1] =
   {
     .CbInit      = NULL,
     .CbCtrlSetup = CDC_CtrlSetupReq,
     .CbCtrlOut   = CDC_CtrlOutReq,
     .CbSOF       = NULL,
-    .CbEndPointI = CDC_BulkBIn,
-    .CbEndPointO = CDC_BulkBOut,
-    .EndPointI   = USB_ENDPOINT_I(USB_ENDPOINT_IDX_CDD),
-    .EndPointO   = USB_ENDPOINT_O(USB_ENDPOINT_IDX_CDD),
+    .CbEndPointI = CDC_BulkI,
+    .CbEndPointO = CDC_BulkO,
+    .Param       = USB_CDC1_NUM,
+    .EndPointI   = USB_ENDPOINT_I(USB_ENDPOINT_IDX_CDC1),
+    .EndPointO   = USB_ENDPOINT_O(USB_ENDPOINT_IDX_CDC1),
   },
 };
 
 /* -------------------------------------------------------------------------- */
 
-U8 USBD_CDC_GetInterfaceNumber(void)
+USB_CDC_NUM USBD_CDC_GetPortNumber(U16 aIfcIdx)
 {
-  return USB_INTERFACE_IDX_CDC;
+  static const USB_CDC_NUM itfIdx2CdcNumMap[USB_INTERFACE_IDX_CNT] =
+  {
+    [USB_INTERFACE_IDX_CDC0] = USB_CDC0_NUM,
+    [USB_INTERFACE_IDX_CDC1] = USB_CDC1_NUM,
+  };
+  return itfIdx2CdcNumMap[aIfcIdx];
 }
 
 /* -------------------------------------------------------------------------- */
 
-U8 USBD_CDD_GetInterfaceNumber(void)
+static USB_INTERFACE_IDX USBD_CDC_GetInterfaceIndex(U8 aCdcNum)
 {
-  return USB_INTERFACE_IDX_CDD;
+  static const USB_INTERFACE_IDX cdcNum2ItfIdxMap[USB_CDC_CNT] =
+  {
+    [USB_CDC0_NUM] = USB_INTERFACE_IDX_CDC0,
+    [USB_CDC1_NUM] = USB_INTERFACE_IDX_CDC1,
+  };
+  return cdcNum2ItfIdxMap[aCdcNum];
 }
 
 /* -------------------------------------------------------------------------- */
 
-U32 USBD_CDC_IEndPointWrWsCb(USBD_CbByte pGetByteCb, U32 aSize)
+U32 USBD_CDC_IEP_WrWsCb(USB_CDC_NUM aCdcNum, USBD_CbByte pGetByteCb, U32 aSize)
 {
-  return USBD_EP_WrWsCb
-         (
-           USB_ENDPOINT_I(USB_ENDPOINT_IDX_CDC),
-           pGetByteCb,
-           aSize
-         );
+  USB_INTERFACE_IDX idx = USBD_CDC_GetInterfaceIndex(aCdcNum);
+  return USBD_EP_WrWsCb(USBD_IfCbDescriptor[idx].EndPointI, pGetByteCb, aSize);
 }
 
 /* -------------------------------------------------------------------------- */
 
-FW_BOOLEAN USBD_CDC_IEndPointIsTxEmpty(void)
+FW_BOOLEAN USBD_CDC_IEP_IsTxEmpty(USB_CDC_NUM aCdcNum)
 {
-  return USBD_EP_IsTxEmpty(USB_ENDPOINT_I(USB_ENDPOINT_IDX_CDC));
+  USB_INTERFACE_IDX idx = USBD_CDC_GetInterfaceIndex(aCdcNum);
+  return USBD_EP_IsTxEmpty(USBD_IfCbDescriptor[idx].EndPointI);
 }
 
 /* -------------------------------------------------------------------------- */
 
-U32 USBD_CDC_OEndPointRdWsCb(USBD_CbByte pPutByteCb, U32 aSize)
+U32 USBD_CDC_OEP_RdWsCb(USB_CDC_NUM aCdcNum, USBD_CbByte pPutByteCb, U32 aSize)
 {
-  return USBD_EP_RdWsCb
-         (
-           USB_ENDPOINT_O(USB_ENDPOINT_IDX_CDC),
-           pPutByteCb,
-           aSize
-         );
+  USB_INTERFACE_IDX idx = USBD_CDC_GetInterfaceIndex(aCdcNum);
+  return USBD_EP_RdWsCb(USBD_IfCbDescriptor[idx].EndPointO, pPutByteCb, aSize);
 }
 
 /* -------------------------------------------------------------------------- */
 
-FW_BOOLEAN USBD_CDC_OEndPointIsRxEmpty(void)
+FW_BOOLEAN USBD_CDC_OEP_IsRxEmpty(USB_CDC_NUM aCdcNum)
 {
-  return USBD_EP_IsRxEmpty(USB_ENDPOINT_O(USB_ENDPOINT_IDX_CDC));
+  USB_INTERFACE_IDX idx = USBD_CDC_GetInterfaceIndex(aCdcNum);
+  return USBD_EP_IsRxEmpty(USBD_IfCbDescriptor[idx].EndPointO);
 }
 
 /* -------------------------------------------------------------------------- */
-
-U32 USBD_CDD_IEndPointWrWsCb(USBD_CbByte pGetByteCb, U32 aSize)
-{
-  return USBD_EP_WrWsCb
-         (
-           USB_ENDPOINT_I(USB_ENDPOINT_IDX_CDD),
-           pGetByteCb,
-           aSize
-         );
-}
-
-/* -------------------------------------------------------------------------- */
-
-FW_BOOLEAN USBD_CDD_IEndPointIsTxEmpty(void)
-{
-  return USBD_EP_IsTxEmpty(USB_ENDPOINT_I(USB_ENDPOINT_IDX_CDD));
-}
-
-/* -------------------------------------------------------------------------- */
-U32 USBD_CDD_OEndPointRdWsCb(USBD_CbByte pPutByteCb, U32 aSize)
-{
-  return USBD_EP_RdWsCb
-         (
-           USB_ENDPOINT_O(USB_ENDPOINT_IDX_CDD),
-           pPutByteCb,
-           aSize
-         );
-}
-
-/* -------------------------------------------------------------------------- */
-
-FW_BOOLEAN USBD_CDD_OEndPointIsRxEmpty(void)
-{
-  return USBD_EP_IsRxEmpty(USB_ENDPOINT_O(USB_ENDPOINT_IDX_CDD));
-}
-
-/* -------------------------------------------------------------------------- */
-

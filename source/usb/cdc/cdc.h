@@ -24,11 +24,7 @@ USB_CTRL_STAGE CDC_CtrlOutReq
   U16 *pSize
 );
 void CDC_SOF(void);
-void CDC_InterruptAIn(U32 aEvent);
-void CDC_BulkAIn(U32 aEvent);
-void CDC_BulkAOut(U32 aEvent);
-void CDC_InterruptBIn(U32 aEvent);
-void CDC_BulkBIn(U32 aEvent);
-void CDC_BulkBOut(U32 aEvent);
+void CDC_BulkI(U32 aParam, U32 aEvent);
+void CDC_BulkO(U32 aParam, U32 aEvent);
 
 #endif /* __CDC_H__ */
