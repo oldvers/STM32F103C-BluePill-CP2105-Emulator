@@ -701,27 +701,27 @@ static const U8 gPartNumber = CP210X_PARTNUM_CP2105;
 
 //-----------------------------------------------------------------------------
 /** @brief Gets DTR/RTS signals' state
- *  @param pPort - COM Port context
+ *  @param pCdc - CDC Port context
  *  @return Pointer to DTR/RTS signals' state value
  */
 
-static U8 * cdc_GetUartDtrRts(CDC_PORT * pPort)
+static U8 * cdc_GetUartDtrRts(CDC_PORT * pCdc)
 {
   /* Bit 0 - DTR state, Bit 1 - RTS state */
-  if (UART1 == pPort->uart)
+  if (UART1 == pCdc->uart)
   {
-    if (FW_TRUE == pPort->powerOn)
+    if (FW_TRUE == pCdc->powerOn)
     {
-      pPort->modemStatus.dtr = GPIO_In(UART1_DTR_PORT, UART1_DTR_PIN);
+      pCdc->modemStatus.dtr = GPIO_In(UART1_DTR_PORT, UART1_DTR_PIN);
     }
 
-    if (FW_FALSE == pPort->powerOn)
+    if (FW_FALSE == pCdc->powerOn)
     {
-      pPort->modemStatus.rts = GPIO_In(UART1_RTS_PORT, UART1_RTS_PIN);
+      pCdc->modemStatus.rts = GPIO_In(UART1_RTS_PORT, UART1_RTS_PIN);
     }
   }
 
-  return (U8 *)&pPort->modemStatus;
+  return (U8 *)&pCdc->modemStatus;
 }
 
 //-----------------------------------------------------------------------------
