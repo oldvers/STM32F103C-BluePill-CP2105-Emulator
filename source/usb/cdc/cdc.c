@@ -972,7 +972,7 @@ USB_CTRL_STAGE CDC_CtrlSetupReq
       break;
 
     case CDC_REQ_IFC_ENABLE:
-      CDC_LOG(" - Port %d Enable = %d\r\n", port->uart, pSetup->wValue.W);
+      CDC_LOG(" - Port %d Enable = %d\r\n", pCdc->uart, pSetup->wValue.W);
       cdc_SetUartEnabled(pCdc, pSetup->wValue.W);
       result = USB_CTRL_STAGE_STATUS;
       break;
@@ -1084,11 +1084,11 @@ USB_CTRL_STAGE CDC_CtrlOutReq
   {
     case CDC_REQ_SET_FLOW:
 #ifdef CDC_DEBUG
-      ctrlHndshake = pCdc->pFlowCtrlState->ulControlHandshake;
+      ctrlHndshake = pCdc->flowCtrlState.ulControlHandshake;
       ctrlHndshake &= FLOW_CTRL_HDSHAKE_DTR_MASK;
       ctrlHndshake >>= FLOW_CTRL_HDSHAKE_DTR_POS;
 
-      flowReplace = pCdc->pFlowCtrlState->ulFlowReplace;
+      flowReplace = pCdc->flowCtrlState.ulFlowReplace;
       flowReplace &= FLOW_CTRL_REPLACE_RTS_MASK;
       flowReplace >>= FLOW_CTRL_REPLACE_RTS_POS;
 #endif /* CDC_DEBUG */
@@ -1107,14 +1107,14 @@ USB_CTRL_STAGE CDC_CtrlOutReq
       CDC_LOG
       (
         " - Set Spec Chars: Xon = 0x%02X Xoff = 0x%02X\r\n",
-        port->pSpecChars->bXonChar,
-        port->pSpecChars->bXoffChar
+        pCdc->specChars.bXonChar,
+        pCdc->specChars.bXoffChar
       );
       result = USB_CTRL_STAGE_STATUS;
       break;
 
     case CDC_REQ_SET_BAUDRATE:
-      CDC_LOG(" --- Velue = %d\r\n", port->baudrate);
+      CDC_LOG(" --- Velue = %d\r\n", pCdc->baudrate);
       cdc_SetUartBaudrate(pCdc);
       result = USB_CTRL_STAGE_STATUS;
       break;
